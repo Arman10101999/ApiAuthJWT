@@ -13,9 +13,17 @@ app.get('/api', (req, res) => {
 
 //create a route that's need to be protected
 app.post('/api/posts', verifyToken, (req, res) => {
-    res.json({
-        message: 'Post Created ...'
-    });
+    jwt.verify(req.token, 'secretkey', (err, authData) => {
+        if (err) {
+            res.sendStatus(403);
+        } else {
+            res.json({
+                message: 'Post Created ...',
+                authData
+            });
+        }
+    })
+
 
 });
 
@@ -29,7 +37,7 @@ app.post('/api/login', (req, res) => {
         email: 'arman.bxm@gmail.com'
     }
 
-    jwt.sign({ user: user }, 'secretkey', (err, token) => {
+    jwt.sign({ user: user }, 'secretkey', { expiresIn: '30s' }, (err, token) => {
         res.json({
             token //<-- Es6 STYLE token:token
         });
